@@ -26,7 +26,7 @@ from homeassistant.helpers.selector import (
 )
 
 from . import create_client
-from .api import Dashboard, FFFAuthError, FFFConnectionError, FFFError
+from .api import Dashboard, FFFAccessDenied, FFFAuthError, FFFConnectionError, FFFError
 from .const import (
     CONF_MATCH_DURATION,
     CONF_SCAN_INTERVAL,
@@ -63,8 +63,11 @@ class MyFFFConfigFlow(ConfigFlow, domain=DOMAIN):
         try:
             return await client.login(), None
         except FFFAuthError as err:
-            _LOGGER.warning("MyFFF : connexion refusée : %s", err)
+            _LOGGER.warning("MyFFF : identifiants refusés : %s", err)
             return None, "invalid_auth"
+        except FFFAccessDenied as err:
+            _LOGGER.warning("MyFFF : accès refusé par la sécurité du portail : %s", err)
+            return None, "access_denied"
         except FFFConnectionError as err:
             _LOGGER.warning("MyFFF : portail injoignable : %s", err)
             return None, "cannot_connect"

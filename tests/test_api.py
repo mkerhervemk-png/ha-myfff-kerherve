@@ -4,6 +4,7 @@ from datetime import datetime
 import pytest
 
 from custom_components.myfff.api import (
+    FFFAccessDenied,
     FFFAuthError,
     FFFConnectionError,
     OfficielsClient,
@@ -73,7 +74,9 @@ def test_parse_dashboard_and_reports():
 async def test_login_flow_and_session_reuse():
     portal = standard_portal(NOW)
     client = OfficielsClient(portal, "a@b.fr", "bon-mdp")
+    assert client.session_authenticated is False
     dash = await client.login()
+    assert client.session_authenticated is True
     assert dash.first_name == "Camille"
     assert portal.posted == {
         "emailCanonical": "a@b.fr", "password": "bon-mdp",
@@ -86,6 +89,7 @@ async def test_login_flow_and_session_reuse():
 
     portal.logged_in = False  # session expirée -> reconnexion transparente
     assert len((await client.fetch_reports()).pending) == 1
+    assert client.session_authenticated is True
 
 
 async def test_bad_password_and_errors():
@@ -93,5 +97,7 @@ async def test_bad_password_and_errors():
     with pytest.raises(FFFAuthError):
         await OfficielsClient(portal, "a@b.fr", "mauvais").login()
     portal.status = 403
-    with pytest.raises(FFFConnectionError, match="HTTP 403 sur officiels.fff.fr .serveur : AkamaiGHost"):
+    with pytest.raises(FFFAccessDenied, match="HTTP 403 sur officiels.fff.fr") as err:
         await OfficielsClient(portal, "a@b.fr", "bon-mdp").login()
+    assert err.value.reference == "test-akamai-reference"
+    assert "avant l'authentification" in str(err.value)

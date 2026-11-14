@@ -51,7 +51,7 @@ def home_page(messages: int = 0) -> str:
 class FakeResponse:
     def __init__(self, url: str, text: str, status: int = 200) -> None:
         self.url, self._text, self.status = URL(url), text, status
-        self.headers = {"Server": "AkamaiGHost"}
+        self.headers = {"Server": "AkamaiGHost", "x-reference-error": "test-akamai-reference"}
 
     async def text(self) -> str:
         return self._text

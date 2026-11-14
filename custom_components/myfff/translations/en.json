@@ -21,7 +21,8 @@
       "invalid_auth": "Wrong email or password.",
       "cannot_connect": "Cannot reach the FFF portal.",
       "no_portal": "Signed in, but this account has no access to the referee portal.",
-      "unknown": "Unexpected error, see the log."
+      "unknown": "Unexpected error, see the log.",
+      "access_denied": "The FFF portal denied the request (HTTP 403). This does not mean the password is incorrect. Try again later or contact FFF support with the reference shown in the log."
     },
     "abort": {
       "already_configured": "This account is already configured.",

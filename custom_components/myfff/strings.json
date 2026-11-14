@@ -21,7 +21,8 @@
       "invalid_auth": "Email ou mot de passe incorrect.",
       "cannot_connect": "Impossible de joindre le portail FFF.",
       "no_portal": "Connexion réussie, mais ce compte n'a pas accès au Portail des Officiels.",
-      "unknown": "Erreur inattendue, voir le journal."
+      "unknown": "Erreur inattendue, voir le journal.",
+      "access_denied": "Le portail FFF a refusé la requête (HTTP 403). Ce refus ne signifie pas que le mot de passe est incorrect. Réessaie plus tard ou contacte le support FFF avec la référence présente dans le journal."
     },
     "abort": {
       "already_configured": "Ce compte est déjà configuré.",

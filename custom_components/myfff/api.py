@@ -51,7 +51,20 @@ class FFFAuthError(FFFError):
 
 
 class FFFConnectionError(FFFError):
-    """Portail injoignable."""
+    """Erreur réseau ou réponse HTTP du portail."""
+
+
+class FFFAccessDenied(FFFConnectionError):
+    """Accès refusé par la couche de sécurité du portail (HTTP 403)."""
+
+    def __init__(self, host: str, reference: str | None = None) -> None:
+        self.host = host
+        self.reference = reference
+        detail = f"HTTP 403 sur {host}"
+        if reference:
+            detail += f" (référence sécurité : {reference})"
+        detail += ". Le portail a refusé la requête avant l'authentification."
+        super().__init__(detail)
 
 
 # --------------------------------------------------------------------- modèles
@@ -326,6 +339,14 @@ class OfficielsClient:
         self._password = password
         self._lock = asyncio.Lock()
         self.dashboard: Dashboard | None = None
+        # État indicatif en mémoire : les cookies restent dans le CookieJar de la session.
+        # Cet indicateur n'est vrai qu'après une page protégée effectivement validée.
+        self._authenticated = False
+
+    @property
+    def session_authenticated(self) -> bool:
+        """Indique si une page protégée a récemment confirmé la session."""
+        return self._authenticated
 
     async def _request(
         self,
@@ -345,12 +366,17 @@ class OfficielsClient:
                 method, url, data=data, headers=headers, timeout=TIMEOUT, allow_redirects=True
             ) as resp:
                 _LOGGER.debug("%s %s -> HTTP %s (%s)", method, url, resp.status, resp.url)
-                if resp.status in (401, 403, 429) or resp.status >= 500:
-                    body = (await resp.text())[:200].replace("\n", " ")
-                    raise FFFConnectionError(
-                        f"HTTP {resp.status} sur {resp.url.host} "
-                        f"(serveur : {resp.headers.get('Server', '?')}) : {body}"
-                    )
+                if resp.status == 403:
+                    # Ne pas confondre un refus Akamai/WAF avec des identifiants erronés.
+                    # La référence permet au support FFF de retrouver l'événement côté serveur.
+                    reference = resp.headers.get("x-reference-error")
+                    raise FFFAccessDenied(resp.url.host or "inconnu", reference)
+                if resp.status in (401, 429) or resp.status >= 500:
+                    retry_after = resp.headers.get("Retry-After")
+                    detail = f"HTTP {resp.status} sur {resp.url.host}"
+                    if retry_after:
+                        detail += f" (Retry-After : {retry_after})"
+                    raise FFFConnectionError(detail)
                 html = await resp.text()
                 return str(resp.url), html
         except asyncio.TimeoutError as err:
@@ -375,17 +401,22 @@ class OfficielsClient:
             final_url, html = await self._request("GET", url)
             form = parse_login_form(html)
             if form is not None:
-                _LOGGER.debug("Session FFF absente ou expirée : connexion")
+                self._authenticated = False
+                _LOGGER.debug("Session FFF absente ou expirée : reconnexion automatique")
                 html = await self._login_with(final_url, form)
-                # Après le SSO on atterrit sur l'accueil : on redemande la page voulue.
+                # Après le SSO on atterrit souvent sur l'accueil : redemander la page cible.
                 if path != PATH_HOME or not is_logged_in(html):
                     _, html = await self._request("GET", url)
                 if parse_login_form(html) is not None:
-                    raise FFFAuthError("Connexion FFF refusée")
+                    self._authenticated = False
+                    raise FFFAuthError("Connexion FFF refusée : le formulaire de connexion est toujours présent")
             if not is_logged_in(html):
+                self._authenticated = False
                 raise FFFError(
-                    "Page inattendue : ce compte FFF n'a peut-être pas accès au Portail des Officiels"
+                    "Page inattendue : la session n'est pas confirmée. "
+                    "Ce compte FFF n'a peut-être pas accès au Portail des Officiels."
                 )
+            self._authenticated = True
             return html
 
     async def login(self) -> Dashboard:
