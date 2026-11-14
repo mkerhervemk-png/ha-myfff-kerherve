@@ -1,0 +1,13 @@
+{
+  "domain": "myfff",
+  "name": "MyFFF (Portail des Officiels)",
+  "codeowners": ["@mkerhervemk-png"],
+  "config_flow": true,
+  "documentation": "https://github.com/mkerhervemk-png/ha-myfff-kerherve",
+  "integration_type": "service",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/mkerhervemk-png/ha-myfff-kerherve/issues",
+  "loggers": ["custom_components.myfff"],
+  "requirements": ["beautifulsoup4>=4.12.0"],
+  "version": "0.1.0"
+}

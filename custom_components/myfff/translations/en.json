@@ -1,0 +1,94 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "FFF account (referee portal)",
+        "description": "Credentials of the referee's FFF account (same as officiels.fff.fr and the MyFFF app). Read-only: nothing is changed on the portal.",
+        "data": {
+          "email": "Email",
+          "password": "Password"
+        }
+      },
+      "reauth_confirm": {
+        "title": "FFF re-authentication",
+        "description": "The password for {email} was rejected. Enter it again.",
+        "data": {
+          "password": "Password"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Wrong email or password.",
+      "cannot_connect": "Cannot reach the FFF portal.",
+      "no_portal": "Signed in, but this account has no access to the referee portal.",
+      "unknown": "Unexpected error, see the log."
+    },
+    "abort": {
+      "already_configured": "This account is already configured.",
+      "reauth_successful": "Re-authentication successful."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "MyFFF options",
+        "data": {
+          "scan_interval": "Portal polling interval",
+          "match_duration": "Match duration in the calendar"
+        },
+        "data_description": {
+          "scan_interval": "In hours (1 to 24). The portal has no official API: do not poll too often.",
+          "match_duration": "In minutes, travel excluded."
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "next_designation": {
+        "name": "Next appointment"
+      },
+      "next_match": {
+        "name": "Next match"
+      },
+      "next_venue": {
+        "name": "Next venue"
+      },
+      "next_distance": {
+        "name": "Next match distance"
+      },
+      "upcoming_count": {
+        "name": "Upcoming appointments",
+        "unit_of_measurement": "matchs"
+      },
+      "refereed_count": {
+        "name": "Matches refereed this season",
+        "unit_of_measurement": "matchs"
+      },
+      "last_designation": {
+        "name": "Last match refereed"
+      },
+      "new_messages": {
+        "name": "New messages",
+        "unit_of_measurement": "messages"
+      },
+      "reports_pending": {
+        "name": "Reports to file",
+        "unit_of_measurement": "rapports"
+      }
+    },
+    "binary_sensor": {
+      "referee_today": {
+        "name": "Refereeing today"
+      },
+      "report_pending": {
+        "name": "Report to file"
+      }
+    },
+    "calendar": {
+      "calendar": {
+        "name": "Refereeing"
+      }
+    }
+  }
+}

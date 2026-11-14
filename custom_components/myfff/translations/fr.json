@@ -1,0 +1,94 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Compte FFF (Portail des Officiels)",
+        "description": "Identifiants du compte FFF de l'arbitre (les mêmes que sur officiels.fff.fr et dans l'appli MyFFF). Lecture seule : rien n'est modifié sur le portail.",
+        "data": {
+          "email": "Email",
+          "password": "Mot de passe"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Reconnexion FFF",
+        "description": "Le mot de passe de {email} a été refusé. Saisis-le à nouveau.",
+        "data": {
+          "password": "Mot de passe"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Email ou mot de passe incorrect.",
+      "cannot_connect": "Impossible de joindre le portail FFF.",
+      "no_portal": "Connexion réussie, mais ce compte n'a pas accès au Portail des Officiels.",
+      "unknown": "Erreur inattendue, voir le journal."
+    },
+    "abort": {
+      "already_configured": "Ce compte est déjà configuré.",
+      "reauth_successful": "Reconnexion réussie."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Options MyFFF",
+        "data": {
+          "scan_interval": "Fréquence de lecture du portail",
+          "match_duration": "Durée d'un match au calendrier"
+        },
+        "data_description": {
+          "scan_interval": "En heures (1 à 24). Le portail n'a pas d'API officielle : inutile de le lire trop souvent.",
+          "match_duration": "En minutes, trajet non compris."
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "next_designation": {
+        "name": "Prochaine désignation"
+      },
+      "next_match": {
+        "name": "Prochain match"
+      },
+      "next_venue": {
+        "name": "Prochain stade"
+      },
+      "next_distance": {
+        "name": "Distance du prochain match"
+      },
+      "upcoming_count": {
+        "name": "Désignations à venir",
+        "unit_of_measurement": "matchs"
+      },
+      "refereed_count": {
+        "name": "Matchs arbitrés cette saison",
+        "unit_of_measurement": "matchs"
+      },
+      "last_designation": {
+        "name": "Dernier match arbitré"
+      },
+      "new_messages": {
+        "name": "Nouveaux messages",
+        "unit_of_measurement": "messages"
+      },
+      "reports_pending": {
+        "name": "Rapports à saisir",
+        "unit_of_measurement": "rapports"
+      }
+    },
+    "binary_sensor": {
+      "referee_today": {
+        "name": "Arbitre aujourd'hui"
+      },
+      "report_pending": {
+        "name": "Rapport à saisir"
+      }
+    },
+    "calendar": {
+      "calendar": {
+        "name": "Arbitrage"
+      }
+    }
+  }
+}
