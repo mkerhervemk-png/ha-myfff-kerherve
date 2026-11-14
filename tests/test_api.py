@@ -93,5 +93,5 @@ async def test_bad_password_and_errors():
     with pytest.raises(FFFAuthError):
         await OfficielsClient(portal, "a@b.fr", "mauvais").login()
     portal.status = 403
-    with pytest.raises(FFFConnectionError):
+    with pytest.raises(FFFConnectionError, match="HTTP 403 sur officiels.fff.fr .serveur : AkamaiGHost"):
         await OfficielsClient(portal, "a@b.fr", "bon-mdp").login()

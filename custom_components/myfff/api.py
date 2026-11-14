@@ -344,14 +344,19 @@ class OfficielsClient:
             async with self._session.request(
                 method, url, data=data, headers=headers, timeout=TIMEOUT, allow_redirects=True
             ) as resp:
-                if resp.status in (401, 403):
-                    raise FFFConnectionError(f"Accès refusé par la FFF (HTTP {resp.status})")
-                if resp.status >= 500:
-                    raise FFFConnectionError(f"Portail en erreur (HTTP {resp.status})")
+                _LOGGER.debug("%s %s -> HTTP %s (%s)", method, url, resp.status, resp.url)
+                if resp.status in (401, 403, 429) or resp.status >= 500:
+                    body = (await resp.text())[:200].replace("\n", " ")
+                    raise FFFConnectionError(
+                        f"HTTP {resp.status} sur {resp.url.host} "
+                        f"(serveur : {resp.headers.get('Server', '?')}) : {body}"
+                    )
                 html = await resp.text()
                 return str(resp.url), html
-        except (aiohttp.ClientError, asyncio.TimeoutError) as err:
-            raise FFFConnectionError(f"Portail injoignable : {err}") from err
+        except asyncio.TimeoutError as err:
+            raise FFFConnectionError(f"Pas de réponse en 30 s ({url})") from err
+        except aiohttp.ClientError as err:
+            raise FFFConnectionError(f"{type(err).__name__} : {err}") from err
 
     async def _login_with(self, page_url: str, form: LoginForm) -> str:
         payload = dict(form.fields)

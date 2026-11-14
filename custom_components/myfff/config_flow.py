@@ -62,11 +62,14 @@ class MyFFFConfigFlow(ConfigFlow, domain=DOMAIN):
         client = create_client(self.hass, email, password)
         try:
             return await client.login(), None
-        except FFFAuthError:
+        except FFFAuthError as err:
+            _LOGGER.warning("MyFFF : connexion refusée : %s", err)
             return None, "invalid_auth"
-        except FFFConnectionError:
+        except FFFConnectionError as err:
+            _LOGGER.warning("MyFFF : portail injoignable : %s", err)
             return None, "cannot_connect"
-        except FFFError:
+        except FFFError as err:
+            _LOGGER.warning("MyFFF : portail inaccessible : %s", err)
             return None, "no_portal"
         except Exception:  # noqa: BLE001
             _LOGGER.exception("Erreur MyFFF inattendue")
